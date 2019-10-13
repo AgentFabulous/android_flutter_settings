@@ -43,32 +43,47 @@ class AndroidFlutterSettings {
       });
 
   /// Put methods
-  static Future<bool> putString(String setting, String value, SettingType type) async =>
+  static Future<bool> putString(
+          String setting, String value, SettingType type) async =>
       await _channel.invokeMethod('putString', {
         'type': resolveEnum(type),
         'value': value,
         'setting': setting,
       });
 
-  static Future<bool> putInt(String setting, int value, SettingType type) async =>
+  static Future<bool> putInt(
+          String setting, int value, SettingType type) async =>
       await _channel.invokeMethod('putInt', {
         'type': resolveEnum(type),
         'value': value,
         'setting': setting,
       });
 
-  static Future<bool> putBool(String setting, bool value, SettingType type) async =>
+  static Future<bool> putBool(
+          String setting, bool value, SettingType type) async =>
       await _channel.invokeMethod('putBool', {
         'type': resolveEnum(type),
         'value': value,
         'setting': setting,
       });
 
-  static Future<bool> putDouble(String setting, double value, SettingType type) async =>
+  static Future<bool> putDouble(
+          String setting, double value, SettingType type) async =>
       await _channel.invokeMethod('putFloat', {
         'type': resolveEnum(type),
         'value': value,
         'setting': setting,
+      });
+
+  static Future<void> setProp(String key, String value) async =>
+      await _channel.invokeMethod('setProp', {
+        'key': key,
+        'value': value,
+      });
+
+  static Future<String> getProp(String key) async =>
+      await _channel.invokeMethod('getProp', {
+        'key': key,
       });
 
   static String resolveEnum(SettingType type) => type.toString().split('.')[1];

@@ -10,6 +10,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.os.SystemProperties;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.util.Log;
@@ -107,6 +108,18 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
                 String setting = call.argument("setting");
                 resultSuccess(result, value != null &&
                         putLong(setting, value, SettingType.valueOf(type)));
+                break;
+            }
+            case "setProp": {
+                String key = call.argument("key");
+                String value = call.argument("value");
+                SystemProperties.set(key, value);
+                resultSuccess(result, null);
+                break;
+            }
+            case "getProp": {
+                String key = call.argument("key");
+                resultSuccess(result, SystemProperties.get(key));
                 break;
             }
             default:
