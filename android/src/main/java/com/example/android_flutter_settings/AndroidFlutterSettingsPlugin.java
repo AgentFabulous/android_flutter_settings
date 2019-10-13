@@ -31,7 +31,7 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
 
 
     public static void registerWith(Registrar registrar) {
-        final MethodChannel methodProvider = new MethodChannel(registrar.messenger(), "android_flutter_updater/methods");
+        final MethodChannel methodProvider = new MethodChannel(registrar.messenger(), "android_flutter_settings/methods");
         methodProvider.setMethodCallHandler(new AndroidFlutterSettingsPlugin(registrar.activity()));
     }
 
