@@ -1,19 +1,22 @@
 package com.example.android_flutter_settings;
 
 import android.annotation.NonNull;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.om.IOverlayManager;
+import android.os.AsyncTask;
+import android.os.RemoteException;
+import android.os.ServiceManager;
+import android.os.SystemProperties;
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
+import android.util.Log;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.os.SystemProperties;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
-import android.util.Log;
 
 /**
  * AndroidFlutterSettingsPlugin
@@ -120,6 +123,12 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
             case "getProp": {
                 String key = call.argument("key");
                 resultSuccess(result, SystemProperties.get(key));
+                break;
+            }
+            case "reloadAssets": {
+                String pkg = call.argument("pkg");
+                reloadAssets(pkg);
+                resultSuccess(result, null);
                 break;
             }
             default:
@@ -268,6 +277,18 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
                 return Settings.Global.putLong(mActivity.getContentResolver(), setting, value);
             default:
                 return false;
+        }
+    }
+
+    private IOverlayManager getOverlayManager() {
+        return IOverlayManager.Stub.asInterface(ServiceManager.getService("overlay"));
+    }
+
+    private void reloadAssets(String packageName) {
+        try {
+            getOverlayManager().reloadAssets(packageName, -2); // packageName, UserHandle.USER_CURRENT
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 

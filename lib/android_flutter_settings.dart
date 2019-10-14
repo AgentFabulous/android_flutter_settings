@@ -86,5 +86,10 @@ class AndroidFlutterSettings {
         'key': key,
       });
 
+  static Future<void> reloadAssets(String pkg) async =>
+      await _channel.invokeMethod('reloadAssets', {
+        'pkg': pkg,
+      });
+
   static String resolveEnum(SettingType type) => type.toString().split('.')[1];
 }
