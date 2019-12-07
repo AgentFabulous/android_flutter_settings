@@ -61,7 +61,7 @@ class AndroidFlutterSettings {
 
   static Future<bool> putBool(
           String setting, bool value, SettingType type) async =>
-      await _channel.invokeMethod('putBool', {
+      await _channel.invokeMethod('putBoolean', {
         'type': resolveEnum(type),
         'value': value,
         'setting': setting,
