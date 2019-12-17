@@ -4,7 +4,6 @@ import android.annotation.NonNull;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.om.IOverlayManager;
-import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemProperties;
@@ -83,7 +82,13 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
             }
             case "putInt": {
                 String type = call.argument("type");
-                Integer value = call.argument("value");
+                Integer value;
+                Object val = call.argument("value");
+                if (val instanceof Long) {
+                    value = ((Long) val).intValue();
+                } else {
+                    value = (Integer) val;
+                }
                 String setting = call.argument("setting");
                 resultSuccess(result, value != null &&
                         putInt(setting, value, SettingType.valueOf(type)));
