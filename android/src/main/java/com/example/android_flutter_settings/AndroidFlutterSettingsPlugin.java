@@ -83,8 +83,7 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
             }
             case "putInt": {
                 String type = call.argument("type");
-                Long lValue = call.argument("value");
-                Integer value = lValue.intValue();
+                Integer value = call.argument("value");
                 String setting = call.argument("setting");
                 resultSuccess(result, value != null &&
                         putInt(setting, value, SettingType.valueOf(type)));
