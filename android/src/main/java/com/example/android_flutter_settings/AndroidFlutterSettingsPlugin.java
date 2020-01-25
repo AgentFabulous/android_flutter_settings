@@ -8,8 +8,6 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemProperties;
 import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
-import android.util.Log;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -52,7 +50,11 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
             case "getInt": {
                 String type = call.argument("type");
                 String setting = call.argument("setting");
-                resultSuccess(result, getInt(setting, SettingType.valueOf(type)));
+                int retInt = getInt(setting, SettingType.valueOf(type));
+                Integer ret;
+                if (retInt == Integer.MIN_VALUE) ret = retInt;
+                else ret = null;
+                resultSuccess(result, ret);
                 break;
             }
             case "getBoolean": {
@@ -64,13 +66,21 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
             case "getFloat": {
                 String type = call.argument("type");
                 String setting = call.argument("setting");
-                resultSuccess(result, getFloat(setting, SettingType.valueOf(type)));
+                float retFloat = getFloat(setting, SettingType.valueOf(type));
+                Float ret;
+                if (retFloat == Integer.MIN_VALUE) ret = retFloat;
+                else ret = null;
+                resultSuccess(result, ret);
                 break;
             }
             case "getLong": {
                 String type = call.argument("type");
                 String setting = call.argument("setting");
-                resultSuccess(result, getLong(setting, SettingType.valueOf(type)));
+                long retLong = getLong(setting, SettingType.valueOf(type));
+                Long ret;
+                if (retLong == Integer.MIN_VALUE) ret = retLong;
+                else ret = null;
+                resultSuccess(result, ret);
                 break;
             }
             case "putString": {
@@ -169,60 +179,49 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
     }
 
     private int getInt(String setting, SettingType type) {
-        try {
-            switch (type) {
-                case SYSTEM:
-                    return Settings.System.getInt(mActivity.getContentResolver(), setting);
-                case SECURE:
-                    return Settings.Secure.getInt(mActivity.getContentResolver(), setting);
-                case GLOBAL:
-                    return Settings.Global.getInt(mActivity.getContentResolver(), setting);
-                default:
-                    return -1;
-            }
-        } catch (SettingNotFoundException e) {
-            Log.e(TAG, "Setting not found: " + type.toString() + '/' + setting);
-            return -1;
+        switch (type) {
+            case SYSTEM:
+                return Settings.System.getInt(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            case SECURE:
+                return Settings.Secure.getInt(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            case GLOBAL:
+                return Settings.Global.getInt(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            default:
+                return -1;
         }
     }
 
-    private boolean getBoolean(String setting, SettingType type) {
-        return getInt(setting, type) != 0;
+    private Boolean getBoolean(String setting, SettingType type) {
+        int retInt = getInt(setting, type);
+        if (retInt == Integer.MIN_VALUE)
+            return null;
+        else
+            return getInt(setting, type) != 0;
     }
 
     private float getFloat(String setting, SettingType type) {
-        try {
-            switch (type) {
-                case SYSTEM:
-                    return Settings.System.getFloat(mActivity.getContentResolver(), setting);
-                case SECURE:
-                    return Settings.Secure.getFloat(mActivity.getContentResolver(), setting);
-                case GLOBAL:
-                    return Settings.Global.getFloat(mActivity.getContentResolver(), setting);
-                default:
-                    return -1;
-            }
-        } catch (SettingNotFoundException e) {
-            Log.e(TAG, "Setting not found: " + type.toString() + '/' + setting);
-            return -1;
+        switch (type) {
+            case SYSTEM:
+                return Settings.System.getFloat(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            case SECURE:
+                return Settings.Secure.getFloat(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            case GLOBAL:
+                return Settings.Global.getFloat(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            default:
+                return -1;
         }
     }
 
     private long getLong(String setting, SettingType type) {
-        try {
-            switch (type) {
-                case SYSTEM:
-                    return Settings.System.getLong(mActivity.getContentResolver(), setting);
-                case SECURE:
-                    return Settings.Secure.getLong(mActivity.getContentResolver(), setting);
-                case GLOBAL:
-                    return Settings.Global.getLong(mActivity.getContentResolver(), setting);
-                default:
-                    return -1;
-            }
-        } catch (SettingNotFoundException e) {
-            Log.e(TAG, "Setting not found: " + type.toString() + '/' + setting);
-            return -1;
+                switch (type) {
+            case SYSTEM:
+                return Settings.System.getLong(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            case SECURE:
+                return Settings.Secure.getLong(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            case GLOBAL:
+                return Settings.Global.getLong(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
+            default:
+                return -1;
         }
     }
 
