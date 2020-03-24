@@ -52,7 +52,7 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
                 String setting = call.argument("setting");
                 int retInt = getInt(setting, SettingType.valueOf(type));
                 Integer ret;
-                if (retInt == Integer.MIN_VALUE) ret = retInt;
+                if (retInt != Integer.MIN_VALUE) ret = retInt;
                 else ret = null;
                 resultSuccess(result, ret);
                 break;
