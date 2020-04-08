@@ -86,8 +86,28 @@ class AndroidFlutterSettings {
         'key': key,
       });
 
-  static Future<void> reloadAssets(String pkg) async =>
+  static Future<bool> reloadAssets(String pkg) async =>
       await _channel.invokeMethod('reloadAssets', {
+        'pkg': pkg,
+      });
+
+  static Future<bool> overlaySetEnabled(String pkg, bool enable) async =>
+      await _channel.invokeMethod('overlaySetEnabled', {
+        'pkg': pkg,
+        'enable': enable,
+      });
+
+  static Future<bool> overlaySetEnabledExclusive(
+    String pkg,
+    bool enable,
+  ) async =>
+      await _channel.invokeMethod('overlaySetEnabledExclusive', {
+        'pkg': pkg,
+        'enable': enable,
+      });
+
+  static Future<bool> overlaySetEnabledExclusiveInCategory(String pkg) async =>
+      await _channel.invokeMethod('overlaySetEnabledExclusiveInCategory', {
         'pkg': pkg,
       });
 

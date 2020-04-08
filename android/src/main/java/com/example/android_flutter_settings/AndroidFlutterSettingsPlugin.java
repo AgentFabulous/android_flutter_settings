@@ -142,8 +142,24 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
             }
             case "reloadAssets": {
                 String pkg = call.argument("pkg");
-                reloadAssets(pkg);
-                resultSuccess(result, null);
+                resultSuccess(result, reloadAssets(pkg));
+                break;
+            }
+            case "overlaySetEnabled": {
+                String pkg = call.argument("pkg");
+                Boolean enable = call.argument("enable");
+                resultSuccess(result, enable != null && overlaySetEnabled(pkg, enable));
+                break;
+            }
+            case "overlaySetEnabledExclusive": {
+                String pkg = call.argument("pkg");
+                Boolean enable = call.argument("enable");
+                resultSuccess(result, enable != null && overlaySetEnabledExclusive(pkg, enable));
+                break;
+            }
+            case "overlaySetEnabledExclusiveInCategory": {
+                String pkg = call.argument("pkg");
+                resultSuccess(result, overlaySetEnabledExclusiveInCategory(pkg));
                 break;
             }
             default:
@@ -160,7 +176,6 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
             }
         });
     }
-
 
     /**
      * Get methods
@@ -213,7 +228,7 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
     }
 
     private long getLong(String setting, SettingType type) {
-                switch (type) {
+        switch (type) {
             case SYSTEM:
                 return Settings.System.getLong(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
             case SECURE:
@@ -284,16 +299,51 @@ public class AndroidFlutterSettingsPlugin implements MethodCallHandler {
         }
     }
 
+    /**
+     * OMS methods
+     */
     private IOverlayManager getOverlayManager() {
         return IOverlayManager.Stub.asInterface(ServiceManager.getService("overlay"));
     }
 
-    private void reloadAssets(String packageName) {
+    private boolean reloadAssets(String packageName) {
         try {
-            getOverlayManager().reloadAssets(packageName, -2); // packageName, UserHandle.USER_CURRENT
+            getOverlayManager().reloadAssets(packageName, -2); // UserHandle.USER_CURRENT
         } catch (RemoteException e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
+    }
+
+    private boolean overlaySetEnabled(String packageName, boolean enable) {
+        try {
+            getOverlayManager().setEnabled(packageName, enable, -2); // UserHandle.USER_CURRENT
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean overlaySetEnabledExclusive(String packageName, boolean enable) {
+        try {
+            getOverlayManager().setEnabledExclusive(packageName, enable, -2); // UserHandle.USER_CURRENT
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean overlaySetEnabledExclusiveInCategory(String packageName) {
+        try {
+            getOverlayManager().setEnabledExclusiveInCategory(packageName, -2); // UserHandle.USER_CURRENT
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     enum SettingType {
