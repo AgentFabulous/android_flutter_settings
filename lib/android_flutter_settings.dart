@@ -85,13 +85,13 @@ class AndroidFlutterSettings {
 
   static Future<void> setPropByName(String name, String value) async =>
       await _channel.invokeMethod('setProp', {
-        'key': PropKey(name: name),
+        'key': PropKey(name),
         'value': value,
       });
 
   static Future<String?> getPropByName(String name) async =>
       await _channel.invokeMethod('getProp', {
-        'key': PropKey(name: name),
+        'key': PropKey(name),
       });
 
   /// Utils
@@ -110,10 +110,10 @@ class SettingKey<T> extends BaseKey {
   final SettingType type;
   final SettingValueType valueType;
 
-  SettingKey({
-    required String name,
-    required this.type,
-  })   : valueType = _getValueTypeFromT(T),
+  SettingKey(
+    String name,
+    this.type,
+  )   : valueType = _getValueTypeFromT(T),
         super._(name);
 
   static SettingValueType _getValueTypeFromT(Type t) {
@@ -129,9 +129,7 @@ class SettingKey<T> extends BaseKey {
 
 @immutable
 class PropKey extends BaseKey {
-  PropKey({
-    required String name,
-  }) : super._(name);
+  PropKey(String name) : super._(name);
 }
 
 enum SettingType {
