@@ -17,5 +17,5 @@ dev_dependencies:
 
 flutter:
   plugin:
-    androidPackage: com.example.android_flutter_settings
+    androidPackage: co.potatoproject.android_flutter_settings
     pluginClass: AndroidFlutterSettingsPlugin

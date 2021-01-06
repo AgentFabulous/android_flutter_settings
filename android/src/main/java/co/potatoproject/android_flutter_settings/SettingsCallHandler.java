@@ -1,4 +1,4 @@
-package com.example.android_flutter_settings;
+package co.potatoproject.android_flutter_settings;
 
 import android.annotation.NonNull;
 import android.annotation.SuppressLint;
