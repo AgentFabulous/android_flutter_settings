@@ -8,16 +8,16 @@ class AndroidFlutterSettings {
       const MethodChannel('android_flutter_settings/methods');
 
   /// Get methods
-  static Future<String> getString(SettingKey<String> setting) =>
-      _get(setting) as Future<String>;
+  static Future<String?> getString(SettingKey<String> setting) =>
+      _get(setting) as Future<String?>;
 
-  static Future<int> getInt(SettingKey<int> setting) =>
-      _get(setting) as Future<int>;
+  static Future<int?> getInt(SettingKey<int> setting) =>
+      _get(setting) as Future<int?>;
 
-  static Future<bool> getBool(SettingKey<bool> setting) =>
-      _get(setting) as Future<bool>;
+  static Future<bool?> getBool(SettingKey<bool> setting) =>
+      _get(setting) as Future<bool?>;
 
-  static Future<dynamic> _get(SettingKey setting) async {
+  static Future<dynamic?> _get(SettingKey setting) async {
     String method;
 
     switch (setting.valueType) {
@@ -64,10 +64,11 @@ class AndroidFlutterSettings {
     }
 
     return await _channel.invokeMethod(method, {
-      'type': resolveEnum(setting.type),
-      'value': value,
-      'setting': setting.name,
-    });
+          'type': resolveEnum(setting.type),
+          'value': value,
+          'setting': setting.name,
+        }) ??
+        false;
   }
 
   /// Prop methods
@@ -77,9 +78,20 @@ class AndroidFlutterSettings {
         'value': value,
       });
 
-  static Future<String> getProp(PropKey prop) async =>
+  static Future<String?> getProp(PropKey prop) async =>
       await _channel.invokeMethod('getProp', {
         'key': prop.name,
+      });
+
+  static Future<void> setPropByName(String name, String value) async =>
+      await _channel.invokeMethod('setProp', {
+        'key': PropKey(name: name),
+        'value': value,
+      });
+
+  static Future<String?> getPropByName(String name) async =>
+      await _channel.invokeMethod('getProp', {
+        'key': PropKey(name: name),
       });
 
   /// Utils
