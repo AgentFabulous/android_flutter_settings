@@ -26,9 +26,6 @@ public class SettingsCallHandler implements MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         switch (call.method) {
-            case "getPlatformVersion":
-                resultSuccess(result, "Android " + android.os.Build.VERSION.RELEASE);
-                break;
             case "getString": {
                 String type = call.argument("type");
                 String setting = call.argument("setting");
@@ -49,26 +46,6 @@ public class SettingsCallHandler implements MethodCallHandler {
                 String type = call.argument("type");
                 String setting = call.argument("setting");
                 resultSuccess(result, getBoolean(setting, SettingType.valueOf(type)));
-                break;
-            }
-            case "getFloat": {
-                String type = call.argument("type");
-                String setting = call.argument("setting");
-                float retFloat = getFloat(setting, SettingType.valueOf(type));
-                Float ret;
-                if (retFloat == Integer.MIN_VALUE) ret = retFloat;
-                else ret = null;
-                resultSuccess(result, ret);
-                break;
-            }
-            case "getLong": {
-                String type = call.argument("type");
-                String setting = call.argument("setting");
-                long retLong = getLong(setting, SettingType.valueOf(type));
-                Long ret;
-                if (retLong == Integer.MIN_VALUE) ret = retLong;
-                else ret = null;
-                resultSuccess(result, ret);
                 break;
             }
             case "putString": {
@@ -100,22 +77,6 @@ public class SettingsCallHandler implements MethodCallHandler {
                         putBoolean(setting, value, SettingType.valueOf(type)));
                 break;
             }
-            case "putFloat": {
-                String type = call.argument("type");
-                Float value = call.argument("value");
-                String setting = call.argument("setting");
-                resultSuccess(result, value != null &&
-                        putFloat(setting, value, SettingType.valueOf(type)));
-                break;
-            }
-            case "putLong": {
-                String type = call.argument("type");
-                Long value = call.argument("value");
-                String setting = call.argument("setting");
-                resultSuccess(result, value != null &&
-                        putLong(setting, value, SettingType.valueOf(type)));
-                break;
-            }
             case "setProp": {
                 String key = call.argument("key");
                 String value = call.argument("value");
@@ -126,28 +87,6 @@ public class SettingsCallHandler implements MethodCallHandler {
             case "getProp": {
                 String key = call.argument("key");
                 resultSuccess(result, SystemProperties.get(key));
-                break;
-            }
-            case "reloadAssets": {
-                String pkg = call.argument("pkg");
-                resultSuccess(result, reloadAssets(pkg));
-                break;
-            }
-            case "overlaySetEnabled": {
-                String pkg = call.argument("pkg");
-                Boolean enable = call.argument("enable");
-                resultSuccess(result, enable != null && overlaySetEnabled(pkg, enable));
-                break;
-            }
-            case "overlaySetEnabledExclusive": {
-                String pkg = call.argument("pkg");
-                Boolean enable = call.argument("enable");
-                resultSuccess(result, enable != null && overlaySetEnabledExclusive(pkg, enable));
-                break;
-            }
-            case "overlaySetEnabledExclusiveInCategory": {
-                String pkg = call.argument("pkg");
-                resultSuccess(result, overlaySetEnabledExclusiveInCategory(pkg));
                 break;
             }
             default:
@@ -202,32 +141,6 @@ public class SettingsCallHandler implements MethodCallHandler {
             return getInt(setting, type) != 0;
     }
 
-    private float getFloat(String setting, SettingType type) {
-        switch (type) {
-            case SYSTEM:
-                return Settings.System.getFloat(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
-            case SECURE:
-                return Settings.Secure.getFloat(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
-            case GLOBAL:
-                return Settings.Global.getFloat(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
-            default:
-                return -1;
-        }
-    }
-
-    private long getLong(String setting, SettingType type) {
-        switch (type) {
-            case SYSTEM:
-                return Settings.System.getLong(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
-            case SECURE:
-                return Settings.Secure.getLong(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
-            case GLOBAL:
-                return Settings.Global.getLong(mActivity.getContentResolver(), setting, Integer.MIN_VALUE);
-            default:
-                return -1;
-        }
-    }
-
     /**
      * Put methods
      */
@@ -259,79 +172,6 @@ public class SettingsCallHandler implements MethodCallHandler {
 
     private boolean putBoolean(String setting, boolean value, SettingType type) {
         return putInt(setting, value ? 1 : 0, type);
-    }
-
-    private boolean putFloat(String setting, float value, SettingType type) {
-        switch (type) {
-            case SYSTEM:
-                return Settings.System.putFloat(mActivity.getContentResolver(), setting, value);
-            case SECURE:
-                return Settings.Secure.putFloat(mActivity.getContentResolver(), setting, value);
-            case GLOBAL:
-                return Settings.Global.putFloat(mActivity.getContentResolver(), setting, value);
-            default:
-                return false;
-        }
-    }
-
-    private boolean putLong(String setting, long value, SettingType type) {
-        switch (type) {
-            case SYSTEM:
-                return Settings.System.putLong(mActivity.getContentResolver(), setting, value);
-            case SECURE:
-                return Settings.Secure.putLong(mActivity.getContentResolver(), setting, value);
-            case GLOBAL:
-                return Settings.Global.putLong(mActivity.getContentResolver(), setting, value);
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * OMS methods
-     */
-    private IOverlayManager getOverlayManager() {
-        return IOverlayManager.Stub.asInterface(ServiceManager.getService("overlay"));
-    }
-
-    private boolean reloadAssets(String packageName) {
-        try {
-            getOverlayManager().reloadAssets(packageName, -2); // UserHandle.USER_CURRENT
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    private boolean overlaySetEnabled(String packageName, boolean enable) {
-        try {
-            getOverlayManager().setEnabled(packageName, enable, -2); // UserHandle.USER_CURRENT
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    private boolean overlaySetEnabledExclusive(String packageName, boolean enable) {
-        try {
-            getOverlayManager().setEnabledExclusive(packageName, enable, -2); // UserHandle.USER_CURRENT
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    private boolean overlaySetEnabledExclusiveInCategory(String packageName) {
-        try {
-            getOverlayManager().setEnabledExclusiveInCategory(packageName, -2); // UserHandle.USER_CURRENT
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
     }
 
     enum SettingType {

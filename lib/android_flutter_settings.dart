@@ -7,11 +7,6 @@ class AndroidFlutterSettings {
   static const MethodChannel _channel =
       const MethodChannel('android_flutter_settings/methods');
 
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
-
   /// Get methods
   static Future<String> getString(SettingKey<String> setting) =>
       _get(setting) as Future<String>;
@@ -85,31 +80,6 @@ class AndroidFlutterSettings {
   static Future<String> getProp(PropKey prop) async =>
       await _channel.invokeMethod('getProp', {
         'key': prop.name,
-      });
-
-  /// Overlay methods
-  static Future<bool> reloadAssets(String pkg) async =>
-      await _channel.invokeMethod('reloadAssets', {
-        'pkg': pkg,
-      });
-
-  static Future<bool> overlaySetEnabled(String pkg, bool enable) async =>
-      await _channel.invokeMethod('overlaySetEnabled', {
-        'pkg': pkg,
-        'enable': enable,
-      });
-
-  static Future<bool> overlaySetEnabledExclusive(
-    String pkg,
-    bool enable,
-  ) async =>
-      await _channel.invokeMethod('overlaySetEnabledExclusive', {
-        'pkg': pkg,
-        'enable': enable,
-      });
-  static Future<bool> overlaySetEnabledExclusiveInCategory(String pkg) async =>
-      await _channel.invokeMethod('overlaySetEnabledExclusiveInCategory', {
-        'pkg': pkg,
       });
 
   /// Utils
