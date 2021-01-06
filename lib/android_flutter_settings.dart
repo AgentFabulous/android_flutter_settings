@@ -13,11 +13,14 @@ class AndroidFlutterSettings {
   }
 
   /// Get methods
-  static Future<String> getString(SettingKey<String> setting) => _get(setting);
+  static Future<String> getString(SettingKey<String> setting) =>
+      _get(setting) as Future<String>;
 
-  static Future<int> getInt(SettingKey<int> setting) => _get(setting);
+  static Future<int> getInt(SettingKey<int> setting) =>
+      _get(setting) as Future<int>;
 
-  static Future<bool> getBool(SettingKey<bool> setting) => _get(setting);
+  static Future<bool> getBool(SettingKey<bool> setting) =>
+      _get(setting) as Future<bool>;
 
   static Future<dynamic> _get(SettingKey setting) async {
     String method;
@@ -126,9 +129,9 @@ class SettingKey<T> extends BaseKey {
   final SettingValueType valueType;
 
   SettingKey({
-    @required String name,
-    @required this.type,
-  })  : valueType = _getValueTypeFromT(T),
+    required String name,
+    required this.type,
+  })   : valueType = _getValueTypeFromT(T),
         super._(name);
 
   static SettingValueType _getValueTypeFromT(Type t) {
@@ -145,7 +148,7 @@ class SettingKey<T> extends BaseKey {
 @immutable
 class PropKey extends BaseKey {
   PropKey({
-    @required String name,
+    required String name,
   }) : super._(name);
 }
 
