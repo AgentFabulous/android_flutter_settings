@@ -9,15 +9,13 @@ class AndroidFlutterSettings {
 
   /// Get methods
   static Future<String?> getString(SettingKey<String> setting) =>
-      _get(setting) as Future<String?>;
+      _get<String>(setting);
 
-  static Future<int?> getInt(SettingKey<int> setting) =>
-      _get(setting) as Future<int?>;
+  static Future<int?> getInt(SettingKey<int> setting) => _get<int>(setting);
 
-  static Future<bool?> getBool(SettingKey<bool> setting) =>
-      _get(setting) as Future<bool?>;
+  static Future<bool?> getBool(SettingKey<bool> setting) => _get<bool>(setting);
 
-  static Future<dynamic?> _get(SettingKey setting) async {
+  static Future<T?> _get<T>(SettingKey setting) async {
     String method;
 
     switch (setting.valueType) {
@@ -32,7 +30,7 @@ class AndroidFlutterSettings {
         break;
     }
 
-    return await _channel.invokeMethod(method, {
+    return await _channel.invokeMethod<T?>(method, {
       'type': resolveEnum(setting.type),
       'setting': setting.name,
     });
@@ -56,10 +54,10 @@ class AndroidFlutterSettings {
         method = 'putBoolean';
         break;
       case SettingValueType.INT:
-        method = 'putBoolean';
+        method = 'putInt';
         break;
       case SettingValueType.STRING:
-        method = 'putBoolean';
+        method = 'putString';
         break;
     }
 
@@ -85,13 +83,13 @@ class AndroidFlutterSettings {
 
   static Future<void> setPropByName(String name, String value) async =>
       await _channel.invokeMethod('setProp', {
-        'key': PropKey(name),
+        'key': name,
         'value': value,
       });
 
   static Future<String?> getPropByName(String name) async =>
       await _channel.invokeMethod('getProp', {
-        'key': PropKey(name),
+        'key': name,
       });
 
   /// Utils
@@ -103,6 +101,17 @@ class BaseKey {
   final String name;
 
   BaseKey._(this.name);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is BaseKey) {
+      return this.name == other.name;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => name.hashCode;
 }
 
 @immutable
@@ -117,14 +126,27 @@ class SettingKey<T> extends BaseKey {
         super._(name);
 
   static SettingValueType _getValueTypeFromT(Type t) {
-    if (t is bool) {
+    if (t == bool) {
       return SettingValueType.BOOLEAN;
     }
-    if (t is int || t is double) {
+    if (t == int || t == double) {
       return SettingValueType.INT;
     }
     return SettingValueType.STRING;
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is SettingKey<T>) {
+      return this.name == other.name &&
+          this.type == other.type &&
+          this.valueType == other.valueType;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => name.hashCode ^ type.hashCode ^ valueType.hashCode;
 }
 
 @immutable
