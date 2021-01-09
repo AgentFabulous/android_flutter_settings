@@ -1,5 +1,5 @@
-group 'com.example.android_flutter_settings'
-version '1.0-SNAPSHOT'
+group 'co.potatoproject.android_flutter_settings'
+version '1.0.0'
 
 buildscript {
     repositories {
